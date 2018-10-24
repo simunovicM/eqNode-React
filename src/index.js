@@ -109,7 +109,7 @@ var Node = function (item) {
 	this.map = map(this);
 	this.filter = filter(this);
 	this.filterAny = filterAny(this);
-	this.sortby = sortby(this);
+	this.sortBy = sortBy(this);
 	this.find = find(this);
 	this.forEach = forEach(this);
 	this.toArray = toArray(this);
@@ -120,7 +120,7 @@ Node.fromArray = fromArray;
 Node.map = map;
 Node.filter = filter;
 Node.filterAny = filterAny;
-Node.sortby = sortby;
+Node.sortBy = sortBy;
 Node.find = find;
 Node.forEach = forEach;
 
