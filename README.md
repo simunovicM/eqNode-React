@@ -1,2 +1,5 @@
-# eqNode-React
-eqNode for React
+# eqtree
+
+React Tree Node for npm
+
+Tree node with map, find, filter, filterAny, forEach, toArray and fromArray functions.
