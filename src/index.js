@@ -7,7 +7,7 @@ let toArray = function (node) {
 		node.children.forEach(function (f) { return Node.toArray(f).forEach(function (g) { arr.push(g); }); });
 	return arr;
 }
-let fromArray = function (arr, idProp, findParentFnc) {
+let fromArray = function (arr, findParentFnc) {
 	let nodes = arr.map(function (f) {
 		return new Node(f);
 	});
