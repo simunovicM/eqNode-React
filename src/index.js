@@ -1,4 +1,5 @@
 import { isFunction } from './common';
+import {sortBy as arrSortBy} from './common';
 
 let toArray = function (node) {
 	var arr = [];
@@ -15,17 +16,17 @@ let fromArray = function (arr, findParentFnc) {
 	nodes.forEach(function (f) {
 		var parent = findParentFnc(f.item, arr);
 		if (parent != null)
-			nodes.find(g => g.item === parent).AddChild(f);
+			nodes.find(g => g.item === parent).addChild(f);
 	});
 
-	return nodes.filter(function (f) { return f.GetParent == null; });
+	return nodes.filter(function (f) { return f.getParent == null; });
 }
 let map = function (node) {
 	return function (fnc) {
 		var ret = new Node(fnc(node.item));
 		if (node.children)
 			node.children.forEach(function (g) {
-				ret.AddChild(Node.map(g)(fnc));
+				ret.addChild(Node.map(g)(fnc));
 			});
 		return ret;
 	}
@@ -37,7 +38,7 @@ let filter = function (node) {
 		if (node.children)
 			node.children.forEach(function (g) {
 				var ch = Node.filter(g)(fnc);
-				if (ch) ret.AddChild(ch);
+				if (ch) ret.addChild(ch);
 			});
 		return ret;
 	}
@@ -48,7 +49,7 @@ let filterAny = function (node) {
 		if (node.children)
 			node.children.forEach(function (g) {
 				var ch = Node.filterAny(g)(fnc);
-				if (ch) ret.AddChild(ch);
+				if (ch) ret.addChild(ch);
 			});
 		if (ret.children.length > 0 || fnc(node)) return ret;
 	}
@@ -59,9 +60,9 @@ let sortBy = function (node) {
 
 		var propFnc = isFunction(prop) ? f => prop(f) : f => f[prop];
 		if (node.children)
-			node.children.sortBy(propFnc, sortFnc).forEach(function (g) {
+			arrSortBy(node.children, propFnc, sortFnc).forEach(function (g) {
 				var clonedNode = Node.sortBy(g)(prop, sortFnc);
-				ret.AddChild(clonedNode);
+				ret.addChild(clonedNode);
 			});
 		return ret;
 	}
@@ -90,20 +91,26 @@ var Node = function (item) {
 	let self = this;
 	this.item = item;
 	this.children = [];
-	this.AddChild = function (child) {
-		child.GetParent = function () { return self; };
+	this.addChild = function (child) {
+		child.getParent = function () { return self; };
 		this.children.push(child);
+		return this;
 	}
-	this.GetNodeLevel = function () {
-		return this.GetParent == null ? 0 : this.GetParent().GetNodeLevel() + 1;
+	this.removeChild = function (child) {
+		child.getParent = null;
+		this.children = this.children.filter(f => f !== child);
+		return this;
 	}
-	this.GetTopParent = function () {
-		if (this.GetParent == null)
+	this.getNodeLevel = function () {
+		return this.getParent == null ? 0 : this.getParent().getNodeLevel() + 1;
+	}
+	this.getTopParent = function () {
+		if (this.getParent == null)
 			return this;
-		return this.GetParent().GetTopParent();
+		return this.getParent().GetTopParent();
 	}
-	this.RemoveParent = function () {
-		this.GetParent = null;
+	this.removeParent = function () {
+		this.getParent = null;
 		return this;
 	}
 	this.map = map(this);
@@ -112,7 +119,7 @@ var Node = function (item) {
 	this.sortBy = sortBy(this);
 	this.find = find(this);
 	this.forEach = forEach(this);
-	this.toArray = toArray(this);
+	this.toArray = toArray.bind(null, this);
 }
 
 Node.toArray = toArray;
