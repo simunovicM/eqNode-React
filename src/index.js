@@ -1,11 +1,17 @@
-import { isFunction } from './common';
-import {sortBy as arrSortBy} from './common';
+import {isFunction, sortBy as arrSortBy} from './common';
 
 let toArray = function (node) {
 	var arr = [];
 	arr.push(node.item);
 	if (node.children != null)
 		node.children.forEach(function (f) { return Node.toArray(f).forEach(function (g) { arr.push(g); }); });
+	return arr;
+}
+let toNodeArray = function (node) {
+	var arr = [];
+	arr.push(node);
+	if (node.children != null)
+		node.children.forEach(function (f) { return Node.toNodeArray(f).forEach(function (g) { arr.push(g); }); });
 	return arr;
 }
 let fromArray = function (arr, findParentFnc) {
@@ -23,7 +29,7 @@ let fromArray = function (arr, findParentFnc) {
 }
 let map = function (node) {
 	return function (fnc) {
-		var ret = new Node(fnc(node.item));
+		var ret = new Node(fnc(node));
 		if (node.children)
 			node.children.forEach(function (g) {
 				ret.addChild(Node.map(g)(fnc));
@@ -109,6 +115,11 @@ var Node = function (item) {
 			return this;
 		return this.getParent().GetTopParent();
 	}
+	this.getParents = function () {
+		if (this.getParent == null)
+			return [];
+		return [this.getParent()].concat(this.getParent().getParents());
+	}
 	this.removeParent = function () {
 		this.getParent = null;
 		return this;
@@ -120,9 +131,11 @@ var Node = function (item) {
 	this.find = find(this);
 	this.forEach = forEach(this);
 	this.toArray = toArray.bind(null, this);
+	this.toNodeArray = toNodeArray.bind(null, this);
 }
 
 Node.toArray = toArray;
+Node.toNodeArray = toNodeArray;
 Node.fromArray = fromArray;
 Node.map = map;
 Node.filter = filter;
