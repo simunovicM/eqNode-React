@@ -31,8 +31,8 @@ let map = function (node) {
 	return function (fnc) {
 		var ret = new Node(fnc(node));
 		if (node.children)
-			node.children.forEach(function (g) {
-				ret.addChild(Node.map(g)(fnc));
+			node.children.forEach(function (g, ind) {
+				ret.addChild(Node.map(g)(f => fnc(f, ind)));
 			});
 		return ret;
 	}
@@ -42,8 +42,8 @@ let filter = function (node) {
 		if (!fnc(node)) return null;
 		var ret = new Node(node.item);
 		if (node.children)
-			node.children.forEach(function (g) {
-				var ch = Node.filter(g)(fnc);
+			node.children.forEach(function (g, ind) {
+				var ch = Node.filter(g)(f => fnc(f, ind));
 				if (ch) ret.addChild(ch);
 			});
 		return ret;
@@ -53,8 +53,8 @@ let filterAny = function (node) {
 	return function (fnc) {
 		var ret = new Node(node.item);
 		if (node.children)
-			node.children.forEach(function (g) {
-				var ch = Node.filterAny(g)(fnc);
+			node.children.forEach(function (g, ind) {
+				var ch = Node.filterAny(g)(f => fnc(f, ind));
 				if (ch) ret.addChild(ch);
 			});
 		if (ret.children.length > 0 || fnc(node)) return ret;
